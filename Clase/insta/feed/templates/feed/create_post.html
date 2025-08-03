@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Publicación - SocialFeed</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 16px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.98);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark);
+            transition: var(--transition);
+            border-radius: 8px;
+            padding: 0.5rem 1rem !important;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .profile-image-small {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
+        
+        /* Main Content Styles */
+        .card {
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: none;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .description-container {
+            min-height: 180px;
+            border-radius: var(--border-radius);
+            background-color: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            transition: var(--transition);
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .description-container:focus-within {
+            background-color: white;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        }
+        
+        textarea.description-input {
+            border: none;
+            background: transparent;
+            resize: none;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            outline: none;
+            font-family: inherit;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            overflow: hidden;
+        }
+        
+        .description-tools {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+        
+        .description-container:focus-within .description-tools {
+            opacity: 1;
+        }
+        
+        .btn-tool {
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .character-counter {
+            font-size: 0.85rem;
+            color: var(--gray);
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            transition: var(--transition);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .header-icon {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .tips-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: none;
+        }
+        
+        .tip-icon {
+            background: rgba(67, 97, 238, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        .footer {
+            margin-top: auto;
+            padding: 2rem 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        @media (max-width: 768px) {
+            .description-container {
+                min-height: 150px;
+                padding: 1.2rem;
+            }
+            
+            .header-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Universal -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'feed:home' %}">
+                <i class="bi bi-camera me-2"></i>SocialFeed
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'feed:home' %}">
+                            <i class="bi bi-house-door me-1"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'feed:explore' %}">
+                            <i class="bi bi-compass me-1"></i> Explorar
+                        </a>
+                    </li>
+                    <li class="nav-item d-lg-none">
+                        <a class="nav-link" href="{% url 'feed:create_post' %}">
+                            <i class="bi bi-plus-square me-1"></i> Nueva publicación
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item d-none d-lg-block">
+                        <a class="nav-link" href="{% url 'feed:create_post' %}">
+                            <i class="bi bi-plus-square me-1"></i> Nueva publicación
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown ms-lg-2">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="rounded-circle profile-image-small me-2">
+                            <span>jose</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'feed:profile' username=user.username %}">
+                                <i class="bi bi-person me-2"></i>Perfil
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'feed:edit_profile' %}">
+                                <i class="bi bi-pencil me-2"></i>Editar perfil
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'feed:logout' %}">
+                                <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'feed:login' %}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-lg-2 mt-2 mt-lg-0" href="{% url 'feed:register' %}">
+                            Registrarse
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Page Header -->
+                <div class="d-flex align-items-center gap-3 mb-5">
+                    <div class="header-icon">
+                        <i class="bi bi-pencil"></i>
+                    </div>
+                    <div>
+                        <h1 class="h2 fw-bold mb-1">Crear Nueva Publicación</h1>
+                        <p class="text-muted mb-0">Comparte tus momentos con la comunidad</p>
+                    </div>
+                </div>
+                
+                <!-- Create Post Card -->
+                <div class="card mb-5">
+                    <div class="card-body p-4">
+                        <form>
+                            <!-- Image Upload -->
+                            <div class="mb-4">
+                                <label class="form-label fw-medium mb-3">
+                                    <i class="bi bi-image me-2 text-primary"></i> Imagen de la publicación
+                                </label>
+                                
+                                <div class="border border-2 border-dashed rounded-3 p-5 text-center bg-light position-relative">
+                                    <div class="position-absolute top-50 start-50 translate-middle">
+                                        <i class="bi bi-cloud-arrow-up fs-1 text-muted mb-3"></i>
+                                        <p class="mb-2 fw-medium">Arrastra una imagen aquí</p>
+                                        <p class="text-muted mb-3">o haz clic para seleccionar</p>
+                                        <button type="button" class="btn btn-outline-primary px-4">
+                                            <i class="bi bi-folder-plus me-2"></i>Seleccionar Imagen
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Description Area -->
+                            <div class="mb-4">
+                                <label class="form-label fw-medium mb-3">
+                                    <i class="bi bi-chat-text me-2 text-primary"></i> Descripción
+                                </label>
+                                
+                                <div class="description-container">
+                                    <textarea 
+                                        class="description-input" 
+                                        placeholder="Comparte algo sobre esta imagen..."
+                                        maxlength="500"
+                                    ></textarea>
+                                    
+                                    <div class="character-counter">
+                                        <span id="charCount">0</span>/500 caracteres
+                                    </div>
+                                    
+                                    <div class="description-tools">
+                                        <button type="button" class="btn btn-tool btn-outline-secondary me-2">
+                                            <i class="bi bi-emoji-smile"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-tool btn-outline-secondary">
+                                            <i class="bi bi-hash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-text mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Puedes mencionar personas usando @, agregar emojis 😊 o usar hashtags #viaje
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between pt-3 mt-4 border-top">
+                                <a href="{% url 'feed:home' %}" class="btn btn-lg btn-outline-secondary px-4">
+                                    <i class="bi bi-x-lg me-2"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-lg btn-primary px-4">
+                                    <i class="bi bi-send me-2"></i> Publicar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Tips Card -->
+                <div class="card tips-card">
+                    <div class="card-body">
+                        <h5 class="d-flex align-items-center mb-4">
+                            <i class="bi bi-lightbulb me-2 text-warning"></i>
+                            Consejos para una buena descripción
+                        </h5>
+                        
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="d-flex gap-3">
+                                    <div class="tip-icon">
+                                        <i class="bi bi-chat-quote"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Cuenta una historia</h6>
+                                        <p class="mb-0 text-muted small">Comparte el contexto detrás de la imagen</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="d-flex gap-3">
+                                    <div class="tip-icon">
+                                        <i class="bi bi-hash"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Usa hashtags</h6>
+                                        <p class="mb-0 text-muted small">Aumenta el alcance con etiquetas relevantes</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="d-flex gap-3">
+                                    <div class="tip-icon">
+                                        <i class="bi bi-emoji-smile"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Expresa emociones</h6>
+                                        <p class="mb-0 text-muted small">Usa emojis para hacerlo más expresivo</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="text-center">
+                <p class="mb-0 text-muted">
+                    © 2023 SocialFeed. Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('.description-input');
+            const charCount = document.getElementById('charCount');
+            
+            // Contador de caracteres
+            textarea.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = length;
+                
+                // Cambiar color cuando se acerca al límite
+                if (length > 450) {
+                    charCount.style.color = '#dc3545';
+                } else if (length > 400) {
+                    charCount.style.color = '#fd7e14';
+                } else {
+                    charCount.style.color = '';
+                }
+            });
+            
+            // Ajustar altura automáticamente
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Disparar el evento input para el ajuste inicial
+            textarea.dispatchEvent(new Event('input'));
+            
+            // Botones de herramientas (ejemplo)
+            document.querySelectorAll('.btn-tool').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Funcionalidad de ' + this.querySelector('i').className.split('-')[1] + ' activada');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

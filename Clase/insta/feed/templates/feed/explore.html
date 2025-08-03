@@ -1,0 +1,550 @@
+{% extends 'feed/base.html' %}
+{% load static %}
+
+{% block title %}Explorar - SocialFeed{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --border-radius: 16px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    .explore-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+    
+    .search-section {
+        margin-bottom: 3rem;
+        padding: 0 1rem;
+    }
+    
+    .search-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+    }
+    
+    .search-title {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .search-title i {
+        margin-right: 10px;
+        color: var(--primary);
+        font-size: 1.8rem;
+    }
+    
+    .search-form {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .search-input {
+        flex: 1;
+        border-radius: 50px;
+        padding: 0.9rem 1.5rem;
+        border: 1px solid #e2e8f0;
+        font-size: 1.05rem;
+        transition: var(--transition);
+    }
+    
+    .search-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        outline: none;
+    }
+    
+    .search-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0 1.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .search-btn:hover {
+        background: var(--secondary);
+        transform: translateY(-2px);
+    }
+    
+    .results-section {
+        margin-bottom: 3rem;
+    }
+    
+    .section-title {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-left: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .section-title i {
+        margin-right: 10px;
+        color: var(--primary);
+        font-size: 1.5rem;
+    }
+    
+    .users-results {
+        margin-bottom: 3rem;
+    }
+    
+    .user-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .user-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        transition: var(--transition);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .user-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 1.2rem;
+        border: 2px solid #f1f1f1;
+    }
+    
+    .user-info {
+        flex: 1;
+    }
+    
+    .user-username {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .user-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+    
+    .stat-value {
+        font-weight: 600;
+        color: var(--dark);
+    }
+    
+    .view-profile {
+        color: var(--primary);
+        font-weight: 500;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        background: var(--light);
+        border-radius: var(--border-radius);
+    }
+    
+    .no-results i {
+        font-size: 3.5rem;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
+    }
+    
+    .no-results-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results-text {
+        color: var(--gray);
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .post-card {
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        position: relative;
+    }
+    
+    .post-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .post-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .post-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .post-card:hover .post-overlay {
+        opacity: 1;
+    }
+    
+    .post-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .post-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 1.1rem;
+    }
+    
+    .empty-posts {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem 2rem;
+        background: var(--light);
+        border-radius: var(--border-radius);
+    }
+    
+    .empty-icon {
+        font-size: 3.5rem;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-text {
+        color: var(--gray);
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .trending-section {
+        margin-top: 4rem;
+        padding: 0 1rem;
+    }
+    
+    .trending-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+    }
+    
+    .trending-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .trending-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    
+    .trending-item:last-child {
+        border-bottom: none;
+    }
+    
+    .trending-number {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: var(--primary);
+        width: 40px;
+        text-align: center;
+    }
+    
+    .trending-info {
+        flex: 1;
+    }
+    
+    .trending-tag {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+    
+    .trending-count {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        .user-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+        
+        .posts-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .search-form {
+            flex-direction: column;
+        }
+        
+        .search-btn {
+            padding: 0.9rem;
+            width: 100%;
+        }
+        
+        .user-card {
+            padding: 1.2rem;
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .trending-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="explore-container">
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-card">
+            <h2 class="search-title">
+                <i class="bi bi-search"></i>
+                Encuentra personas y contenido
+            </h2>
+            <form method="GET" action="{% url 'feed:explore' %}" class="search-form">
+                <input type="text" name="q" class="search-input" 
+                       placeholder="Buscar usuarios, publicaciones, hashtags..."
+                       value="{{ query|default:'' }}">
+                <button type="submit" class="search-btn">
+                    Buscar
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results Sections -->
+    <div class="results-section">
+        <!-- Users Results -->
+        {% if query and users %}
+        <div class="users-results">
+            <h3 class="section-title">
+                <i class="bi bi-people"></i>
+                Usuarios encontrados
+            </h3>
+            
+            <div class="user-grid">
+                {% for user_result in users %}
+                <a href="{% url 'feed:profile' username=user_result.username %}" class="user-card">
+                    <img src="{{ user_result.profile.profile_picture.url }}" alt="{{ user_result.username }}" class="user-avatar">
+                    <div class="user-info">
+                        <div class="user-username">{{ user_result.username }}</div>
+                        <div class="user-stats">
+                            <div>
+                                <span class="stat-value">{{ user_result.post_set.count }}</span> posts
+                            </div>
+                            <div>
+                                <span class="stat-value">{{ user_result.profile.get_followers_count }}</span> seguidores
+                            </div>
+                        </div>
+                    </div>
+                    <div class="view-profile">Ver perfil →</div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% elif query and not users %}
+        <div class="no-results">
+            <i class="bi bi-person-x"></i>
+            <h3 class="no-results-title">No se encontraron usuarios</h3>
+            <p class="no-results-text">
+                No hay usuarios que coincidan con "{{ query }}". Prueba con otro nombre.
+            </p>
+        </div>
+        {% endif %}
+        
+        <!-- Posts Results -->
+        <div class="posts-results">
+            <h3 class="section-title">
+                <i class="bi bi-images"></i>
+                {% if query %}
+                    Publicaciones relacionadas
+                {% else %}
+                    Explora publicaciones recientes
+                {% endif %}
+            </h3>
+            
+            <div class="posts-grid">
+                {% for post in posts %}
+                <a href="{% url 'feed:post_detail' pk=post.pk %}" class="text-decoration-none">
+                    <div class="post-card">
+                        <img src="{{ post.image.url }}" class="post-image" alt="{{ post.caption }}">
+                        <div class="post-overlay">
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <i class="bi bi-heart-fill"></i> {{ post.likes.count }}
+                                </div>
+                                <div class="post-stat">
+                                    <i class="bi bi-chat"></i> {{ post.comments.count }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="empty-posts">
+                    <div class="empty-icon">
+                        <i class="bi bi-camera"></i>
+                    </div>
+                    <h3 class="empty-title">
+                        {% if query %}
+                            No hay publicaciones que coincidan
+                        {% else %}
+                            No hay publicaciones para explorar
+                        {% endif %}
+                    </h3>
+                    <p class="empty-text">
+                        {% if query %}
+                            No se encontraron publicaciones para "{{ query }}"
+                        {% else %}
+                            Cuando los usuarios compartan publicaciones, aparecerán aquí.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'feed:create_post' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Crear publicación
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Trending Section -->
+    <div class="trending-section">
+        <div class="trending-card">
+            <h3 class="section-title">
+                <i class="bi bi-fire"></i>
+                Tendencias
+            </h3>
+            
+            <ul class="trending-list">
+                <li class="trending-item">
+                    <div class="trending-number">1</div>
+                    <div class="trending-info">
+                        <div class="trending-tag">#viajes</div>
+                        <div class="trending-count">1,245 publicaciones</div>
+                    </div>
+                </li>
+                <li class="trending-item">
+                    <div class="trending-number">2</div>
+                    <div class="trending-info">
+                        <div class="trending-tag">#naturaleza</div>
+                        <div class="trending-count">982 publicaciones</div>
+                    </div>
+                </li>
+                <li class="trending-item">
+                    <div class="trending-number">3</div>
+                    <div class="trending-info">
+                        <div class="trending-tag">#comida</div>
+                        <div class="trending-count">845 publicaciones</div>
+                    </div>
+                </li>
+                <li class="trending-item">
+                    <div class="trending-number">4</div>
+                    <div class="trending-info">
+                        <div class="trending-tag">#arquitectura</div>
+                        <div class="trending-count">723 publicaciones</div>
+                    </div>
+                </li>
+                <li class="trending-item">
+                    <div class="trending-number">5</div>
+                    <div class="trending-info">
+                        <div class="trending-tag">#deportes</div>
+                        <div class="trending-count">612 publicaciones</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focus search input on page load if there's a query
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput && "{{ query }}") {
+            searchInput.focus();
+            searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+        }
+        
+        // Animation for trending items
+        const trendingItems = document.querySelectorAll('.trending-item');
+        trendingItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'all 0.5s ease';
+                
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, 100);
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock %}

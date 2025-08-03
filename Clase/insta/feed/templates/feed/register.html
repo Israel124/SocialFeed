@@ -1,0 +1,423 @@
+{% extends 'feed/base.html' %}
+{% load static %}
+
+{% block title %}Regístrate - SocialFeed{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --border-radius: 16px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    .register-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        padding: 2rem;
+    }
+    
+    .register-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 100%;
+        max-width: 500px;
+        overflow: hidden;
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        color: white;
+    }
+    
+    .register-icon {
+        background: rgba(255, 255, 255, 0.2);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+    }
+    
+    .register-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .register-subtitle {
+        opacity: 0.9;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .register-body {
+        padding: 2.5rem 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 0.5rem;
+        color: var(--primary);
+    }
+    
+    .form-control {
+        border-radius: var(--border-radius);
+        padding: 0.9rem 1.25rem 0.9rem 3rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #dee2e6;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--gray);
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.9rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: var(--transition);
+        width: 100%;
+        color: white;
+        margin-top: 1rem;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .terms-text {
+        font-size: 0.85rem;
+        color: var(--gray);
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    
+    .terms-text a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+    
+    .terms-text a:hover {
+        text-decoration: underline;
+    }
+    
+    .login-footer {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f1f1f1;
+        margin-top: 1.5rem;
+    }
+    
+    .login-footer a {
+        color: var(--primary);
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    .alert-danger {
+        border-radius: var(--border-radius);
+        background: rgba(220, 53, 69, 0.1);
+        border: none;
+        color: #dc3545;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .alert-danger i {
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+    }
+    
+    .strength-meter {
+        height: 5px;
+        border-radius: 2.5px;
+        margin-top: 0.5rem;
+        background: #e2e8f0;
+        overflow: hidden;
+    }
+    
+    .strength-bar {
+        height: 100%;
+        width: 0;
+        background: #dc3545;
+        transition: width 0.3s ease;
+    }
+    
+    .strength-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--gray);
+        margin-top: 0.3rem;
+    }
+    
+    .strength-label {
+        transition: color 0.3s ease;
+    }
+    
+    @media (max-width: 576px) {
+        .register-container {
+            padding: 1rem;
+        }
+        
+        .register-header {
+            padding: 2rem 1.5rem;
+        }
+        
+        .register-body {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <div class="register-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <h2 class="register-title">Únete a SocialFeed</h2>
+            <p class="register-subtitle">Crea una cuenta para empezar a compartir tus momentos con el mundo</p>
+        </div>
+        
+        <div class="register-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Error Messages -->
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <div>{{ form.non_field_errors }}</div>
+                    </div>
+                {% endif %}
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="bi bi-person"></i> Nombre de usuario
+                    </label>
+                    <div class="position-relative">
+                        <i class="bi bi-person input-icon"></i>
+                        {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.username.errors %}
+                                <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="form-text small mt-1">
+                            Elige un nombre único que te identifique
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                        <i class="bi bi-envelope"></i> Correo electrónico
+                    </label>
+                    <div class="position-relative">
+                        <i class="bi bi-envelope input-icon"></i>
+                        {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.email.errors %}
+                                <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="form-text small mt-1">
+                            Nunca compartiremos tu email con nadie
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">
+                        <i class="bi bi-key"></i> Contraseña
+                    </label>
+                    <div class="position-relative">
+                        <i class="bi bi-key input-icon"></i>
+                        {{ form.password }}
+                        <i class="bi bi-eye password-toggle" id="passwordToggle"></i>
+                    </div>
+                    
+                    <!-- Password Strength Meter -->
+                    <div class="strength-meter mt-2">
+                        <div class="strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <div class="strength-labels">
+                        <span class="strength-label" id="strengthWeak">Débil</span>
+                        <span class="strength-label" id="strengthMedium">Media</span>
+                        <span class="strength-label" id="strengthStrong">Fuerte</span>
+                    </div>
+                    
+                    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.password.errors %}
+                                <i class="bi bi-exclamation-circle me-1"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="form-text small mt-1">
+                            Usa 8 o más caracteres con una mezcla de letras, números y símbolos
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Terms Agreement -->
+                <div class="terms-text">
+                    Al registrarte, aceptas nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>
+                </div>
+                
+                <!-- Register Button -->
+                <button type="submit" class="btn btn-register">
+                    <i class="bi bi-person-plus me-2"></i> Crear cuenta
+                </button>
+                
+                <!-- Login Link -->
+                <div class="login-footer">
+                    <p>¿Ya tienes una cuenta? <a href="{% url 'feed:login' %}">Inicia sesión aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const strengthLabels = {
+            weak: document.getElementById('strengthWeak'),
+            medium: document.getElementById('strengthMedium'),
+            strong: document.getElementById('strengthStrong')
+        };
+        
+        // Toggle password visibility
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', function() {
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    this.classList.remove('bi-eye');
+                    this.classList.add('bi-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    this.classList.remove('bi-eye-slash');
+                    this.classList.add('bi-eye');
+                }
+            });
+        }
+        
+        // Password strength indicator
+        if (passwordField) {
+            passwordField.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                // Length check
+                if (password.length >= 8) strength += 25;
+                if (password.length >= 12) strength += 25;
+                
+                // Character variety
+                if (/[A-Z]/.test(password)) strength += 15;
+                if (/[a-z]/.test(password)) strength += 15;
+                if (/[0-9]/.test(password)) strength += 10;
+                if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+                
+                // Update strength bar
+                strengthBar.style.width = strength + '%';
+                
+                // Update colors and labels
+                strengthLabels.weak.style.color = '';
+                strengthLabels.medium.style.color = '';
+                strengthLabels.strong.style.color = '';
+                
+                if (strength < 40) {
+                    strengthBar.style.backgroundColor = '#dc3545';
+                    strengthLabels.weak.style.color = '#dc3545';
+                } else if (strength < 70) {
+                    strengthBar.style.backgroundColor = '#fd7e14';
+                    strengthLabels.medium.style.color = '#fd7e14';
+                } else {
+                    strengthBar.style.backgroundColor = '#28a745';
+                    strengthLabels.strong.style.color = '#28a745';
+                }
+            });
+        }
+        
+        // Add focus effect to inputs
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+        });
+    });
+</script>
+{% endblock %}

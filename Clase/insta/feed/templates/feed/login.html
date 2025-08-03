@@ -1,0 +1,360 @@
+{% extends 'feed/base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión - SocialFeed{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --border-radius: 16px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        padding: 2rem;
+    }
+    
+    .login-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 100%;
+        max-width: 450px;
+        overflow: hidden;
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        color: white;
+    }
+    
+    .login-icon {
+        background: rgba(255, 255, 255, 0.2);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+    }
+    
+    .login-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .login-subtitle {
+        opacity: 0.9;
+    }
+    
+    .login-body {
+        padding: 2.5rem 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .form-label i {
+        margin-right: 0.5rem;
+        color: var(--primary);
+    }
+    
+    .form-control {
+        border-radius: var(--border-radius);
+        padding: 0.9rem 1.25rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #dee2e6;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    .input-with-icon {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+    }
+    
+    .input-with-icon input {
+        padding-left: 3rem;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.9rem;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: var(--transition);
+        width: 100%;
+        color: white;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(67, 97, 238, 0.3);
+    }
+    
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 1.5rem 0;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e2e8f0;
+        z-index: 1;
+    }
+    
+    .divider-text {
+        background: white;
+        position: relative;
+        z-index: 2;
+        padding: 0 1rem;
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+    
+    .social-login {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .social-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 1px solid #e2e8f0;
+        transition: var(--transition);
+        font-size: 1.2rem;
+    }
+    
+    .social-btn.facebook {
+        color: #1877f2;
+    }
+    
+    .social-btn.google {
+        color: #ea4335;
+    }
+    
+    .social-btn.twitter {
+        color: #1da1f2;
+    }
+    
+    .social-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .login-footer {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f1f1f1;
+    }
+    
+    .login-footer a {
+        color: var(--primary);
+        font-weight: 500;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+    
+    .alert-danger {
+        border-radius: var(--border-radius);
+        background: rgba(220, 53, 69, 0.1);
+        border: none;
+        color: #dc3545;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: var(--gray);
+    }
+    
+    @media (max-width: 576px) {
+        .login-container {
+            padding: 1rem;
+        }
+        
+        .login-header {
+            padding: 2rem 1.5rem;
+        }
+        
+        .login-body {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="bi bi-lock"></i>
+            </div>
+            <h2 class="login-title">Bienvenido de vuelta</h2>
+            <p class="login-subtitle">Inicia sesión para continuar a tu cuenta</p>
+        </div>
+        
+        <div class="login-body">
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        <div>{{ form.non_field_errors }}</div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="bi bi-person"></i> Nombre de usuario
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-person input-icon"></i>
+                        {{ form.username }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.password.id_for_label }}" class="form-label">
+                        <i class="bi bi-key"></i> Contraseña
+                    </label>
+                    <div class="input-with-icon">
+                        <i class="bi bi-key input-icon"></i>
+                        {{ form.password }}
+                        <i class="bi bi-eye password-toggle" id="passwordToggle"></i>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Recordarme
+                        </label>
+                    </div>
+                    <a href="#" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-login">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Iniciar sesión
+                </button>
+                
+                <div class="divider">
+                    <span class="divider-text">o inicia sesión con</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn facebook">
+                        <i class="bi bi-facebook"></i>
+                    </button>
+                    <button type="button" class="social-btn google">
+                        <i class="bi bi-google"></i>
+                    </button>
+                    <button type="button" class="social-btn twitter">
+                        <i class="bi bi-twitter"></i>
+                    </button>
+                </div>
+                
+                <div class="login-footer">
+                    <p>¿No tienes una cuenta? <a href="{% url 'feed:register' %}">Regístrate aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordField = document.getElementById('{{ form.password.id_for_label }}');
+        const passwordToggle = document.getElementById('passwordToggle');
+        
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', function() {
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    this.classList.remove('bi-eye');
+                    this.classList.add('bi-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    this.classList.remove('bi-eye-slash');
+                    this.classList.add('bi-eye');
+                }
+            });
+        }
+        
+        // Add focus effect to inputs
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.parentElement.classList.add('focused');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.parentElement.classList.remove('focused');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,433 @@
+{% extends 'feed/base.html' %}
+{% load static %}
+
+{% block title %}Editar Perfil - SocialFeed{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --border-radius: 16px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    .profile-edit-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .profile-card {
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        border: none;
+        overflow: hidden;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        padding: 2rem 0;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+    
+    .profile-avatar-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        object-fit: cover;
+    }
+    
+    .avatar-overlay {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.9);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .avatar-overlay:hover {
+        transform: scale(1.1);
+        background: var(--primary);
+        color: white;
+    }
+    
+    .profile-info {
+        padding: 1.5rem 2rem;
+    }
+    
+    .profile-section {
+        margin-bottom: 1.8rem;
+    }
+    
+    .section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        color: var(--primary);
+    }
+    
+    .section-title i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .form-control, .form-control:focus {
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .btn-primary {
+        background-color: var(--primary);
+        border-color: var(--primary);
+        transition: var(--transition);
+        border-radius: 12px;
+        padding: 0.75rem 1.75rem;
+        font-weight: 500;
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary);
+        border-color: var(--secondary);
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        border-radius: 12px;
+        padding: 0.75rem 1.75rem;
+    }
+    
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        cursor: default;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .avatar-preview-container {
+        display: none;
+        text-align: center;
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        border: 1px dashed #dee2e6;
+        border-radius: var(--border-radius);
+    }
+    
+    .avatar-preview {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+        border: 3px solid #f1f1f1;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .profile-stats {
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        
+        .profile-info {
+            padding: 1.5rem 1rem;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class="container py-5">
+    <div class="profile-edit-container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="h2 fw-bold mb-1">Editar Perfil</h1>
+                <p class="text-muted">Actualiza tu información personal y preferencias</p>
+            </div>
+            <a href="{% url 'feed:profile' username=user.username %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Volver al perfil
+            </a>
+        </div>
+        
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar-container">
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="profile-avatar" id="currentAvatar">
+                    <div class="avatar-overlay" onclick="document.getElementById('id_profile_picture').click()">
+                        <i class="bi bi-camera"></i>
+                    </div>
+                </div>
+                <h3 class="mb-0">{{ user.username }}</h3>
+                <p class="mb-0">{{ user.email }}</p>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ post_count }}</div>
+                        <div class="stat-label">Publicaciones</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ follower_count }}</div>
+                        <div class="stat-label">Seguidores</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ following_count }}</div>
+                        <div class="stat-label">Siguiendo</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Avatar Preview Section -->
+                    <div class="avatar-preview-container" id="avatarPreviewContainer">
+                        <h5 class="mb-3">Vista previa de tu nueva foto de perfil</h5>
+                        <img src="#" alt="Preview" class="avatar-preview" id="avatarPreview">
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-outline-danger" id="cancelAvatarBtn">
+                                <i class="bi bi-x-circle me-2"></i> Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Picture Field -->
+                    <div class="profile-section">
+                        <div class="section-title">
+                            <i class="bi bi-image"></i>
+                            <span>Foto de perfil</span>
+                        </div>
+                        {{ form.profile_picture }}
+                        {% if form.profile_picture.errors %}
+                            <div class="alert alert-danger mt-3">
+                                {% for error in form.profile_picture.errors %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            Formatos recomendados: JPG, PNG (máx. 5MB). La imagen se recortará a un círculo.
+                        </div>
+                    </div>
+                    
+                    <!-- Bio Field -->
+                    <div class="profile-section">
+                        <div class="section-title">
+                            <i class="bi bi-pencil"></i>
+                            <span>Biografía</span>
+                        </div>
+                        {{ form.bio }}
+                        {% if form.bio.errors %}
+                            <div class="alert alert-danger mt-3">
+                                {% for error in form.bio.errors %}
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                                        {{ error }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text mt-2">
+                            <i class="bi bi-lightbulb me-1"></i>
+                            Cuéntale a la comunidad sobre ti. Puedes incluir intereses, profesión o una frase inspiradora.
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Fields -->
+                    <div class="profile-section">
+                        <div class="section-title">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>Ubicación</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="¿Dónde vives?" value="{{ user.profile.location|default_if_none:'' }}">
+                    </div>
+                    
+                    <div class="profile-section">
+                        <div class="section-title">
+                            <i class="bi bi-link-45deg"></i>
+                            <span>Sitio web</span>
+                        </div>
+                        <input type="url" class="form-control" placeholder="https://tusitio.com" value="{{ user.profile.website|default_if_none:'' }}">
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between pt-4 mt-4 border-top">
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i> Restablecer
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i> Guardar cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tips Section -->
+        <div class="card mt-4 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="d-flex align-items-center">
+                    <i class="bi bi-lightbulb text-warning me-2"></i>
+                    Consejos para un perfil atractivo
+                </h5>
+                <div class="row mt-3">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Foto de perfil clara</h6>
+                                <p class="mb-0 text-muted small">Usa una foto donde tu rostro sea visible</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Biografía interesante</h6>
+                                <p class="mb-0 text-muted small">Cuéntanos algo único sobre ti</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Enlaces relevantes</h6>
+                                <p class="mb-0 text-muted small">Agrega tu sitio web o redes sociales</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarInput = document.getElementById('id_profile_picture');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
+        const currentAvatar = document.getElementById('currentAvatar');
+        const cancelAvatarBtn = document.getElementById('cancelAvatarBtn');
+        
+        // Preview new avatar
+        if (avatarInput) {
+            avatarInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        avatarPreview.src = e.target.result;
+                        avatarPreviewContainer.style.display = 'block';
+                        
+                        // Scroll to preview
+                        avatarPreviewContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // Cancel avatar change
+        if (cancelAvatarBtn) {
+            cancelAvatarBtn.addEventListener('click', function() {
+                avatarPreviewContainer.style.display = 'none';
+                avatarInput.value = '';
+            });
+        }
+        
+        // Auto-resize textarea
+        const bioTextarea = document.getElementById('id_bio');
+        if (bioTextarea) {
+            bioTextarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // Trigger initial resize
+            setTimeout(() => {
+                bioTextarea.dispatchEvent(new Event('input'));
+            }, 100);
+        }
+        
+        // Format numbers for display
+        const statValues = document.querySelectorAll('.stat-value');
+        statValues.forEach(stat => {
+            const value = parseInt(stat.textContent);
+            if (value >= 1000) {
+                stat.textContent = (value / 1000).toFixed(1) + 'K';
+            }
+        });
+    });
+</script>
+{% endblock %}

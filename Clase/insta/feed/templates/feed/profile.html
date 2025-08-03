@@ -1,0 +1,467 @@
+{% extends 'feed/base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }} - SocialFeed{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --border-radius: 16px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        padding: 3rem 0;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-info {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        color: white;
+    }
+    
+    .profile-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+    }
+    
+    .profile-avatar:hover {
+        transform: scale(1.05);
+    }
+    
+    .profile-username {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-bio {
+        max-width: 600px;
+        margin: 0 auto 1.5rem;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        cursor: pointer;
+        padding: 0.8rem 1.2rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        transition: var(--transition);
+    }
+    
+    .stat-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .btn-follow {
+        background: white;
+        color: var(--primary);
+        border: none;
+        border-radius: 50px;
+        padding: 0.7rem 1.8rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    
+    .btn-follow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-edit {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        padding: 0.7rem 1.8rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+    
+    .btn-edit:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .posts-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .posts-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .posts-title i {
+        margin-right: 0.8rem;
+        color: var(--primary);
+    }
+    
+    .posts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .post-card {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        position: relative;
+    }
+    
+    .post-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .post-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .post-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .post-card:hover .post-overlay {
+        opacity: 1;
+    }
+    
+    .post-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+    
+    .post-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 1.1rem;
+    }
+    
+    .empty-posts {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem 2rem;
+        background: var(--light);
+        border-radius: var(--border-radius);
+    }
+    
+    .empty-icon {
+        font-size: 3.5rem;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
+    }
+    
+    .empty-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-text {
+        color: var(--gray);
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .tabs {
+        display: flex;
+        justify-content: center;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+    }
+    
+    .tab {
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        color: var(--gray);
+        cursor: pointer;
+        position: relative;
+        transition: var(--transition);
+    }
+    
+    .tab.active {
+        color: var(--primary);
+        font-weight: 600;
+    }
+    
+    .tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary);
+        border-radius: 3px 3px 0 0;
+    }
+    
+    .tab:hover {
+        color: var(--dark);
+    }
+    
+    @media (max-width: 768px) {
+        .profile-stats {
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            padding: 0.6rem 0.8rem;
+        }
+        
+        .profile-actions {
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .btn-follow, .btn-edit {
+            width: 100%;
+        }
+        
+        .posts-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .profile-header {
+            padding: 2rem 0;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+        }
+        
+        .profile-username {
+            font-size: 1.7rem;
+        }
+        
+        .profile-stats {
+            flex-wrap: wrap;
+        }
+        
+        .posts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-info">
+            <img src="{{ profile_user.profile.profile_picture.url }}" alt="Profile" class="profile-avatar">
+            <h1 class="profile-username">{{ profile_user.username }}</h1>
+            
+            {% if profile_user.profile.bio %}
+            <p class="profile-bio">{{ profile_user.profile.bio }}</p>
+            {% endif %}
+            
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ profile_user.post_set.count }}</div>
+                    <div class="stat-label">Publicaciones</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ profile_user.profile.get_followers_count }}</div>
+                    <div class="stat-label">Seguidores</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ profile_user.profile.get_following_count }}</div>
+                    <div class="stat-label">Siguiendo</div>
+                </div>
+            </div>
+            
+            <div class="profile-actions">
+                {% if user.is_authenticated and user != profile_user %}
+                    <a href="{% url 'feed:follow_toggle' username=profile_user.username %}" class="btn btn-follow">
+                        {% if is_following %}
+                            <i class="bi bi-person-dash me-1"></i> Dejar de seguir
+                        {% else %}
+                            <i class="bi bi-person-plus me-1"></i> Seguir
+                        {% endif %}
+                    </a>
+                {% elif user == profile_user %}
+                    <a href="{% url 'feed:edit_profile' %}" class="btn btn-edit">
+                        <i class="bi bi-pencil me-1"></i> Editar perfil
+                    </a>
+                    <a href="{% url 'feed:create_post' %}" class="btn btn-follow">
+                        <i class="bi bi-plus-circle me-1"></i> Nueva publicación
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Content Tabs -->
+    <div class="tabs">
+        <div class="tab active">
+            <i class="bi bi-grid me-1"></i> Publicaciones
+        </div>
+        <div class="tab">
+            <i class="bi bi-bookmark me-1"></i> Guardados
+        </div>
+        <div class="tab">
+            <i class="bi bi-tag me-1"></i> Etiquetados
+        </div>
+    </div>
+    
+    <!-- Posts Grid -->
+    <div class="posts-header">
+        <h2 class="posts-title">
+            <i class="bi bi-images"></i> Publicaciones
+        </h2>
+        <div class="text-muted">
+            {{ posts.count }} publicaciones
+        </div>
+    </div>
+    
+    <div class="posts-grid">
+        {% for post in posts %}
+        <a href="{% url 'feed:post_detail' pk=post.pk %}" class="text-decoration-none">
+            <div class="post-card">
+                <img src="{{ post.image.url }}" class="post-image" alt="{{ post.caption }}">
+                <div class="post-overlay">
+                    <div class="post-stats">
+                        <div class="post-stat">
+                            <i class="bi bi-heart-fill"></i> {{ post.likes.count }}
+                        </div>
+                        <div class="post-stat">
+                            <i class="bi bi-chat"></i> {{ post.comments.count }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="empty-posts">
+            <div class="empty-icon">
+                <i class="bi bi-camera"></i>
+            </div>
+            <h3 class="empty-title">No hay publicaciones aún</h3>
+            <p class="empty-text">
+                {% if user == profile_user %}
+                Cuando compartas publicaciones, aparecerán en tu perfil.
+                {% else %}
+                Este usuario aún no ha compartido ninguna publicación.
+                {% endif %}
+            </p>
+            {% if user == profile_user %}
+            <a href="{% url 'feed:create_post' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Crear primera publicación
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tabs functionality
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Format numbers for display
+        const statValues = document.querySelectorAll('.stat-value');
+        statValues.forEach(stat => {
+            const value = parseInt(stat.textContent);
+            if (value >= 1000) {
+                stat.textContent = (value / 1000).toFixed(1) + 'K';
+            }
+        });
+    });
+</script>
+{% endblock %}
