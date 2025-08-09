@@ -31,6 +31,10 @@
         display: flex;
         gap: 1rem;
         scrollbar-width: none; /* Firefox */
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-clip: padding-box;
     }
     
     .stories-container::-webkit-scrollbar {
@@ -50,15 +54,27 @@
         object-fit: cover;
         border: 3px solid transparent;
         background: linear-gradient(white, white) padding-box,
-                    linear-gradient(45deg, #4361ee, #3a0ca3) border-box;
+                    conic-gradient(from 0deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #f09433) border-box;
         padding: 2px;
         margin-bottom: 0.5rem;
         cursor: pointer;
         transition: var(--transition);
+        animation: rotateRing 4s linear infinite;
     }
     
     .story-avatar:hover {
         transform: scale(1.05);
+    }
+    
+    @keyframes rotateRing {
+        0% {
+            background: linear-gradient(white, white) padding-box,
+                        conic-gradient(from 0deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #f09433) border-box;
+        }
+        100% {
+            background: linear-gradient(white, white) padding-box,
+                        conic-gradient(from 360deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888, #f09433) border-box;
+        }
     }
     
     .story-username {

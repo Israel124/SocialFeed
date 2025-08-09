@@ -6,7 +6,8 @@ Production-ready settings for deployment on Render.
 
 from pathlib import Path
 import os
-from decouple import config
+from decouple import config, Csv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,8 +18,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-7&89pml^wa75tu_pj)%w-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost,http://127.0.0.1').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://127.0.0.1,http://localhost', cast=Csv())
 
 
 # Application definition
@@ -67,21 +68,18 @@ WSGI_APPLICATION = 'insta.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASE_NAME', default='insta_db'),
-        'USER': config('DATABASE_USER', default='postgres'),
-        'PASSWORD': config('DATABASE_PASSWORD', default=''),
-        'HOST': config('DATABASE_HOST', default='localhost'),
-        'PORT': config('DATABASE_PORT', default='5432'),
+database_url = config('DATABASE_URL', default=None)
+if database_url is None:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
-
-# Use SQLite for local development if DATABASE_URL is not provided
-import dj_database_url
-if config('DATABASE_URL', default=None):
-    DATABASES['default'] = dj_database_url.parse(config('DATABASE_URL'))
+else:
+    DATABASES = {
+        'default': dj_database_url.parse(database_url)
+    }
 
 
 # Password validation
